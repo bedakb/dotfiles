@@ -60,6 +60,9 @@ vim.opt.scrolloff = 10
 -- Automatically resize all buffers if terminal window gets resized
 vim.api.nvim_command 'autocmd VimResized * wincmd ='
 
+-- Enable colorcolumn
+vim.opt.colorcolumn = '100'
+
 -- [[ Autocommands ]]
 
 vim.api.nvim_create_autocmd('TextYankPost', {
@@ -634,7 +637,9 @@ require('lazy').setup {
       { 'fredrikaverpil/neotest-golang', version = '*' },
     },
     config = function()
-      local neotest_golang_opts = {}
+      local neotest_golang_opts = {
+        go_test_args = { '-v', '-count=1' },
+      }
       local nt = require 'neotest'
       nt.setup {
         adapters = {
@@ -645,6 +650,30 @@ require('lazy').setup {
       vim.keymap.set('n', '<leader>rnt', function()
         nt.run.run()
       end, { desc = 'Testing: Run the nearest test' })
+    end,
+  },
+  {
+    'olexsmir/gopher.nvim',
+    ft = 'go',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-treesitter/nvim-treesitter',
+    },
+    build = function()
+      vim.cmd [[silent! GoInstallDeps]]
+    end,
+    config = function(_, opts)
+      require('gopher').setup(opts)
+
+      vim.keymap.set('n', '<leader>gsj', '<cmd> GoTagAdd json <CR>', {
+        noremap = true,
+        desc = 'Add JSON Struct tags',
+      })
+
+      vim.keymap.set('n', '<leader>gsy', '<cmd> GoTagAdd yaml <CR>', {
+        noremap = true,
+        desc = 'Add YAML Struct tags',
+      })
     end,
   },
 }
